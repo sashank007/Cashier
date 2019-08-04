@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,7 +52,7 @@ public class SignUpActivity extends Activity {
     private FirebaseAuth firebaseAuth;
     public static int RC_SIGN_IN=1;
     private DatabaseReference mDatabase;
-    EditText et_email, et_phone , et_budget, et_spending , et_password;
+    EditText et_email, et_phone , et_budget , et_password;
     String email ,first_name,last_name , budget,passWord;
     String phone;
     @Override
@@ -61,7 +62,7 @@ public class SignUpActivity extends Activity {
         firebaseAuth  = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_signup);
-//        initializeVars();
+        initializeVars();
 
     }
 
@@ -103,7 +104,7 @@ public class SignUpActivity extends Activity {
                     FirebaseUser user = firebaseAuth.getCurrentUser(); //You Firebase user
                     // user registered, start profile activity
                     Toast.makeText(SignUpActivity.this,"Account Created",Toast.LENGTH_LONG).show();
-                    System.out.println("new user succesfully created");
+                    System.out.println("new user succesfully created" + user.getUid());
                     User newUser = new User(f_email,f_budget);
                     mDatabase.child("users").child(user.getUid()).setValue(newUser);
 
@@ -151,34 +152,36 @@ public class SignUpActivity extends Activity {
 
     public void signup() {
 
+        Log.d("SINGUP" , "Inside signup ");
 
-        if( ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECEIVE_SMS)
-                != PackageManager.PERMISSION_GRANTED ) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            Toast.makeText(this,"Without access to SMS we cannot let you login." , Toast.LENGTH_LONG).show();
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.RECEIVE_SMS)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_SMS},
-                        101);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        }
+//
+//        if( ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.RECEIVE_SMS)
+//                != PackageManager.PERMISSION_GRANTED ) {
+//
+//            // Permission is not granted
+//            // Should we show an explanation?
+//            Toast.makeText(this,"Without access to SMS we cannot let you login." , Toast.LENGTH_LONG).show();
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.RECEIVE_SMS)) {
+//                // Show an explanation to the user *asynchronously* -- don't block
+//                // this thread waiting for the user's response! After the user
+//                // sees the explanation, try again to request the permission.
+//            } else {
+//                // No explanation needed; request the permission
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.READ_SMS},
+//                        101);
+//
+//                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//                // app-defined int constant. The callback method gets the
+//                // result of the request.
+//            }
+//        }
 
 
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Permission is not granted
@@ -186,14 +189,14 @@ public class SignUpActivity extends Activity {
 
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Manifest.permission.CAMERA)) {
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        new String[]{Manifest.permission.CAMERA},
                         100);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -202,7 +205,7 @@ public class SignUpActivity extends Activity {
             }
 
         } else {
-            if (et_email.getText().toString().isEmpty() || et_phone.getText().toString().isEmpty()) {
+            if (et_email.getText().toString().isEmpty() || et_password.getText().toString().isEmpty()) {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("ALERT");
                 alertDialog.setMessage("Please Enter Appropriate Information!");
@@ -216,7 +219,7 @@ public class SignUpActivity extends Activity {
             } else {
 
                 email = et_email.getText().toString().trim().toLowerCase();
-                budget = et_spending.getText().toString().trim();
+                budget = et_budget.getText().toString().trim();
                 passWord = et_password.getText().toString().trim();
                 String uniqueID = UUID.randomUUID().toString();
                 writeNewUser(email,passWord, budget);

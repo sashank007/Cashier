@@ -17,6 +17,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.loopj.android.http.HttpGet;
 import com.sas.cashier.Data.Item;
 
@@ -29,6 +33,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button reset;
     private  JSONArray final_items = null;
     private  Double final_price = null;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference mDatabase;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
@@ -62,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -109,8 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -279,6 +286,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             i.putExtra("title" , title);
             i.putExtra("price" , price);
             i.putExtra("image",image);
+            firebaseAuth  = FirebaseAuth.getInstance();
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            String uniqueID = UUID.randomUUID().toString();
+            mDatabase.child("items").child(user.getUid()).child(uniqueID).setValue(item);
+
             startActivity(i);
 
 
