@@ -3,6 +3,7 @@ package com.sas.cashier;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView totalCost;
     private TextView barcodeValue;
     private Double currentCost = 0.00;
-    private Button reset;
+    private ImageView reset , cart;
     private  JSONArray final_items = null;
     private  Double final_price = null;
     private FirebaseAuth firebaseAuth;
@@ -77,19 +79,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setTitle("Cashier");
 
         totalCost = (TextView)findViewById(R.id.total_cost);
+        totalCost.setShadowLayer(1, 0, 0, Color.BLACK);
         barcodeValue = (TextView)findViewById(R.id.barcode_value);
-        reset = findViewById(R.id.resetButton);
+        reset = findViewById(R.id.reset_btn);
+        cart=findViewById(R.id.cart_btn);
 
 //        autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
 //        useFlash = (CompoundButton) findViewById(R.id.use_flash);
 
         findViewById(R.id.read_barcode).setOnClickListener(this);
 
+
+
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 currentCost=0.0;
                 totalCost.setText("$ "+currentCost.toString());
+            }
+        });
+
+        cart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this,ListActivity.class);
+                startActivity(i);
             }
         });
     }
@@ -282,16 +296,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG," main image : " + image);
 
             Item item = new Item(title , price , image);
-            Intent i = new Intent(MainActivity.this,ListActivity.class);
-            i.putExtra("title" , title);
-            i.putExtra("price" , price);
-            i.putExtra("image",image);
+
             firebaseAuth  = FirebaseAuth.getInstance();
             FirebaseUser user = firebaseAuth.getCurrentUser();
             String uniqueID = UUID.randomUUID().toString();
             mDatabase.child("items").child(user.getUid()).child(uniqueID).setValue(item);
 
-            startActivity(i);
 
 
 

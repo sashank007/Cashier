@@ -45,7 +45,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,7 +56,7 @@
 
         <activity
             android:name=".ListActivity"
-            android:label="@string/title_activity_main" >
+            android:label="Cashier" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,7 +66,24 @@
 
         <activity
             android:name=".SignUpActivity"
-            android:label="@string/title_activity_main" >
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+          >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".TabbedActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

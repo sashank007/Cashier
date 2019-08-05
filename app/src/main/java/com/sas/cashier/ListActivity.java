@@ -45,17 +45,12 @@ public class ListActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         firebaseAuth  = FirebaseAuth.getInstance();
 
-        Intent i = getIntent();
-        Double price = i.getDoubleExtra("price" , 0.0);
-        String image = i.getStringExtra("image");
-        String title  = i.getStringExtra("title");
-
 
         listView=(ListView)findViewById(R.id.list);
 
         dataModels= new ArrayList<>();
 
-//        dataModels.add(new Item(title, price , image));
+//        dataMoMdels.add(new Item(title, price , image));
         getItems();
 
 

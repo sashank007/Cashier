@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorSecondary">#D81B60</color>
-    <color name="colorPrimary">#D81B60</color>
-    <color name="greyLighter">#2B2A2A</color>
+    <color name="colorPrimaryDark">#282828</color>
+    <color name="colorAccent">#dbd7d7</color>
+    <color name="colorSecondary">#344955</color>
+    <color name="colorPrimary">#fff</color>
+    <color name="greyLighter">#b3b3b3</color>
+    <color name="backgroundColor">#111127f5</color>
+    <color name="actionBarBacgkround">#000</color>
 
 </resources>

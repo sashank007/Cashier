@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/baseline_home_white_18dp"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/outline_shopping_cart_white_18dp"
+        android:title="Items" />
+
+</menu>
