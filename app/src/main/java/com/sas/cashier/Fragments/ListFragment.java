@@ -78,14 +78,13 @@ public class ListFragment extends Fragment {
         View v = lf.inflate ( R.layout.fragment_items, container, false );
 
 
-
-
         listView=(ListView)v.findViewById(R.id.list);
 
         dataModels= new ArrayList<>();
 
-//        dataMoMdels.add(new Item(title, price , image));
+//
         getItems();
+
 
         return v;
     }
@@ -118,6 +117,7 @@ public class ListFragment extends Fragment {
 
                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
                     Item item = snap.getValue(Item.class);
+                    Log.d("TAG","item : " + item);
                     myList.add(item);
                 }
                 updateExpensesList(myList);
@@ -133,19 +133,19 @@ public class ListFragment extends Fragment {
 
     private void updateExpensesList(List<Item> myList)
     {
-        System.out.println("my list:" + myList);
+
+
         dataModels.addAll(myList);
 
-        adapter= new CustomAdapter(dataModels,getActivity().getApplicationContext());
+        adapter= new CustomAdapter(dataModels,getContext());
 
         listView.setAdapter(adapter);
 
+//
+//        adapter= new CustomAdapter(dataModels,getContext());
+//
+//        listView.setAdapter(adapter);
 
-//        for(int i = 0 ; i<myList.size();i++)
-//        {
-//            Item currentItem = myList.get(i);
-//            dataModels.add(currentItem);
-//        }
     }
     @Override
     public void onResume() {

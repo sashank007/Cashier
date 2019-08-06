@@ -33,6 +33,7 @@ public class CustomAdapter extends ArrayAdapter<Item> implements View.OnClickLis
     private static class ViewHolder {
         TextView txtTitle;
         TextView txtPrice;
+        Boolean firstLoad=true;
 
         ImageView imgItem;
     }
@@ -69,6 +70,8 @@ public class CustomAdapter extends ArrayAdapter<Item> implements View.OnClickLis
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
+
+        Log.d("Custom adapter" , "Custom adapter caled");
         final View result;
 
         if (convertView == null) {
@@ -92,17 +95,21 @@ public class CustomAdapter extends ArrayAdapter<Item> implements View.OnClickLis
 
 //        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
 //        result.startAnimation(animation);
-        lastPosition = position;
+        if(viewHolder.firstLoad) {
+            lastPosition = position;
 
-        viewHolder.txtTitle.setText(dataModel.getTitle());
-        viewHolder.txtPrice.setText(dataModel.getAmount().toString());
-        new ImageLoadTask(dataModel.getImage(),viewHolder.imgItem).execute();
+            viewHolder.txtTitle.setText(dataModel.getTitle());
+            viewHolder.txtPrice.setText(dataModel.getAmount().toString());
+            new ImageLoadTask(dataModel.getImage(), viewHolder.imgItem).execute();
+            viewHolder.firstLoad=false;
 
 //        viewHolder.txtVersion.setText(dataModel.getVersion_number());
 //        viewHolder.info.setOnClickListener(this);
 //        viewHolder.info.setTag(position);
-        // Return the completed view to render on screen
-        return convertView;
+            // Return the completed view to render on screen
+        }
+            return result;
+
     }
 
     public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {

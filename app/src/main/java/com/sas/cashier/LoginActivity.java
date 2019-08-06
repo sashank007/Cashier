@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
         if (currentUser == null) {
             // No user is signed in
         } else {
-            startActivity(new Intent(this,MainActivity.class));
+            startActivity(new Intent(this,TabbedActivity.class));
         }
     }
 //    private void writeNewUser(String userId, String firstName, String lastName , int highestStreak , int currentStreak ,long timeLeft , int maxSpending , String email , String phone) {
@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Toast.makeText(getApplicationContext(), "Login Successful.", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), TabbedActivity.class));
                     }
                     else
                     {

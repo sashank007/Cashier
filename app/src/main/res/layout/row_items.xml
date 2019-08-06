@@ -60,9 +60,10 @@
             android:layout_height="51dp"
             android:layout_marginLeft="15dp"
             android:gravity="center|left"
-            android:lineHeight="5sp"
+
             android:autoSizeMaxTextSize="16sp"
             android:autoSizeMinTextSize="8sp"
+
             android:maxLength="12"
             android:text="Title"
             android:textColor="#000"

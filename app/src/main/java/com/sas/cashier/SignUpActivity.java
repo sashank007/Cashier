@@ -75,6 +75,13 @@ public class SignUpActivity extends Activity {
         et_password = findViewById(R.id.et_password);
         et_budget = findViewById(R.id.et_budget);
         bt_signup=findViewById(R.id.signup_btn);
+        bt_login = findViewById(R.id.login_btn);
+
+        bt_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SignUpActivity.this,LoginActivity.class));}
+        });
 
 //            @Override
 //            public void onClick(View view) {
@@ -105,11 +112,11 @@ public class SignUpActivity extends Activity {
                     // user registered, start profile activity
                     Toast.makeText(SignUpActivity.this,"Account Created",Toast.LENGTH_LONG).show();
                     System.out.println("new user succesfully created" + user.getUid());
-                    User newUser = new User(f_email,f_budget);
+                    User newUser = new User(f_email,f_budget, 0.0);
                     mDatabase.child("users").child(user.getUid()).setValue(newUser);
 
                     finish();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), TabbedActivity.class));
                 }
                 else{
                     Exception e = task.getException();
@@ -138,7 +145,7 @@ public class SignUpActivity extends Activity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Toast.makeText(getApplicationContext(), "Login Successful.", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), TabbedActivity.class));
                     }
                     else
                     {

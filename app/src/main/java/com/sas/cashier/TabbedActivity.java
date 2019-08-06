@@ -8,6 +8,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -20,7 +21,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -95,8 +99,9 @@ public class TabbedActivity extends AppCompatActivity {
             callRequiredFragment(this.getIntent().getExtras().getString("FragmentCall"),amount);
         }
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomAppBar navigation = findViewById(R.id.navigation);
+//        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+//        na
 //        navigation.setBackgroundColor(getResources().getColor(R.color.white));
 
 
@@ -231,12 +236,33 @@ public class TabbedActivity extends AppCompatActivity {
 
     public void refreshView() {
 
-        Fragment frg = null;
-        frg = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.detach(frg);
-        ft.attach(frg);
-        ft.commit();
+        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered)
+                .setTitle("Warning!")
+                .setMessage("Are you sure you want to clear your cart?")
+                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        Fragment frg = null;
+                        frg = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
+                        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.detach(frg);
+                        ft.attach(frg);
+                        ft.commit();
+
+                        //delete all items in cart
+                        DatabaseReference dbNode = FirebaseDatabase.getInstance().getReference().getRoot().child("items").child(mUser.getUid());
+                        dbNode.setValue(null);
+                        DatabaseReference dbNodeExp = FirebaseDatabase.getInstance().getReference().getRoot().child("users").child(mUser.getUid()).child("expenditure");
+                        dbNodeExp.setValue(null);
+
+                        //display message
+
+
+                    }
+                }).show();
+
+
 
     }
 

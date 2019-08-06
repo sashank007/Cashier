@@ -78,21 +78,26 @@ public class HomeFragment extends Fragment {
 
     private CompoundButton autoFocus;
     private CompoundButton useFlash;
-    private TextView totalCost;
+    private TextView totalCost , tv_splitTotalCost , tv_splitIndex;
     private TextView tv;
     private Double currentCost = 0.00;
     private ImageView reset , cart;
     private JSONArray final_items = null;
     private  Double final_price = null;
     private MaterialButton barcodeReader;
+    private Boolean firstTransaction=true;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase;
     private static int numberOfSplits=0;
-    private CheckBox isSplit;
-    private static Boolean shouldSplit;
-    private static HashMap<Integer,Double> splitAmounts =new HashMap<>();
-    private static int currentSplitee=0;
+    Double result = 0.0;
+    private  FirebaseUser user;
 
+    private CheckBox isSplit;
+    private static Boolean shouldSplit = false;
+    private static HashMap<String,Double> splitAmounts =new HashMap<>();
+    private  int currentSplitee=0;
+
+    private String[] colorPalette = {"#fffcc1" , "#f5b5fc" , "#f3826f" , "#ffd692" , "#ffcbcb" , "#f8f8f8" , "#ff0b55","#badfdb" ,"#49beb7"};
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
 
@@ -111,20 +116,49 @@ public class HomeFragment extends Fragment {
 
     private void initializeVars(View v)
     {
+        firebaseAuth  = FirebaseAuth.getInstance();
 
-
-        totalCost = (TextView)v.findViewById(R.id.total_cost);
+        totalCost = v.findViewById(R.id.total_cost);
         totalCost.setShadowLayer(1, 0, 0, Color.BLACK);
+
+        user = firebaseAuth.getCurrentUser();
+        tv_splitIndex = v.findViewById(R.id.tv_split_index);
+        tv_splitTotalCost = v.findViewById(R.id.total_cost_split);
+        tv_splitIndex.setVisibility(View.INVISIBLE);
+        tv_splitTotalCost.setVisibility(View.INVISIBLE);
+
 
         isSplit= v.findViewById(R.id.split);
 
-//        reset = v.findViewById(R.id.reset_btn);
-
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-//        autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
-//        useFlash = (CompoundButton) findViewById(R.id.use_flash);
+        updateTotalCostAmount(0.0);
+
+
         barcodeReader = v.findViewById(R.id.read_barcode);
+
+
+
+        tv_splitTotalCost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String currentVisibleIndex = tv_splitIndex.getText().toString();
+                int index = Integer.parseInt(currentVisibleIndex);
+                Log.d(TAG,"split index in on click: " + index);
+
+                if(index==numberOfSplits-1)
+                {
+                    tv_splitIndex.setText("0");
+                    setSplittableLayout();
+                }
+                else
+                {
+                    tv_splitIndex.setText(Integer.toString(index+1));
+                    setSplittableLayout();
+                }
+            }
+        });
+
 
         isSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -136,13 +170,12 @@ public class HomeFragment extends Fragment {
                     showNumberPicker();
                     shouldSplit=true;
 
-                    //display option for how many people
-                    //create dialog box
                 }
               else
                 {
                     shouldSplit=false;
                     numberOfSplits=0;
+                    firstTransaction=true;
                 }
             }
         });
@@ -191,6 +224,7 @@ public class HomeFragment extends Fragment {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
     //    private void createNotificationChannel() {
 //        // Create the NotificationChannel, but only on API 26+ because
 //        // the NotificationChannel class is new and not in the support library
@@ -207,6 +241,23 @@ public class HomeFragment extends Fragment {
 //        }
 //    }
 
+    public void setSplittableLayout()
+    {
+        //inside this we hide the old dollar ammount and set number of dollar amounts to be equal to numberOfSplits
+        //show each index each time on click
+        //on click change the value
+        totalCost.setVisibility(View.INVISIBLE);
+        tv_splitTotalCost.setVisibility(View.VISIBLE);
+        tv_splitIndex.setVisibility(View.VISIBLE);
+        Log.d(TAG,"Split amounts in splittable layout : " + splitAmounts );
+        final String currentVisibleIndex =(tv_splitIndex.getText().toString());
+        Log.d(TAG," split index : " + tv_splitIndex.getText().toString());
+        tv_splitTotalCost.setTextColor(Color.parseColor(colorPalette[Integer.parseInt(currentVisibleIndex)]));
+        tv_splitTotalCost.setText("$ " + Double.toString(splitAmounts.get(currentVisibleIndex)));
+
+
+    }
+
     public void showNumberPicker()
     {
 
@@ -216,8 +267,8 @@ public class HomeFragment extends Fragment {
 //        Button b1 = (Button) d.findViewById(R.id.set_number);
 
         final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-        np.setMaxValue(10);
-        np.setMinValue(0);
+        np.setMaxValue(8);
+        np.setMinValue(1);
         np.setWrapSelectorWheel(false);
 
         np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
@@ -225,6 +276,7 @@ public class HomeFragment extends Fragment {
             public void onValueChange(NumberPicker numberPicker, int i, int i1) {
               Log.d(TAG,"number changed " + i + i1);
               numberOfSplits=i1;
+//              setSplittableLayout();
             }
         });
 //        b1.setOnClickListener(new View.OnClickListener()
@@ -245,11 +297,12 @@ public class HomeFragment extends Fragment {
     private void fetchUPCData(String barcodeValue)
     {
         //set all all split amoutns to 0 when fetching
-        if(shouldSplit)
+        if(shouldSplit&&firstTransaction)
         {
-            for(int i = 0 ; i<numberOfSplits;i++)
+            for(int i = 0 ; i<=numberOfSplits;i++)
             {
-                splitAmounts.put(i,0.0);
+                DecimalFormat df = new DecimalFormat("#.##");
+                splitAmounts.put(Integer.toString(i),Double.parseDouble(df.format(0.00)));
             }
         }
         if(barcodeValue!="")
@@ -314,6 +367,40 @@ public class HomeFragment extends Fragment {
 
         }
 
+        private void getCurrentValues()
+        {
+
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+
+
+            Query myQuery = mDatabase.child("splits").child(user.getUid());
+            myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                List<Item> myList = new ArrayList<>();
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()) {
+//                       Double value = snap.getValue(Double.class);
+                        Log.d(TAG,"Snap value : "  + snap.getValue() );
+                        Log.d(TAG,"SNap key : " + snap.getKey());
+                        splitAmounts.put(snap.getKey(),Double.parseDouble(snap.getValue().toString()));
+
+                    }
+                    Log.d(TAG,"SPlit amounts in get current vaue s; " + splitAmounts);
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
+
         private void setTotalCost(Double price, String merchant) {
             DecimalFormat df = new DecimalFormat("#.##");
 
@@ -322,20 +409,15 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG,"splits : " + numberOfSplits);
 
                 //open dialog for selecting currentSplitee
-                currentSplitee=getCurrentSplitee();//2
-                Double currentCost = splitAmounts.get(currentSplitee);
-                price+=currentCost;
-                Log.d(TAG,"getting cost from current index : "  +  currentCost + price);
-                Log.d(TAG,"current cost : " + splitAmounts.get(currentSplitee));
-                //if its split, then get the count of that person and add to that value
-                splitAmounts.put(currentSplitee,price);
-                Log.d(TAG,"Split amounts is updated  " + splitAmounts);
+                getCurrentSplitee(price);
+
             }
             else {
                 Log.d(TAG, "Current cost : " + currentCost);
-                currentCost += price;
-                Log.d(TAG, "new cost : " + currentCost);
-                totalCost.setText("$ " + df.format(currentCost).toString());
+                updateTotalCostAmount(price);
+//                currentCost += price;
+//                Log.d(TAG, "new cost : " + currentCost);
+//                totalCost.setText("$ " + df.format(currentCost).toString());
 
             }
                 JSONArray final_items = getFinalItems();
@@ -355,20 +437,16 @@ public class HomeFragment extends Fragment {
             Double costToAdd= all_prices.get(merchant);
             if(shouldSplit)
             {
-                ArrayList<Double> tempAmounts = new ArrayList<>(numberOfSplits);
+
                 //open dialog for selecting currentSplitee
-                currentSplitee=getCurrentSplitee();
-                //if its split, then get the count of that person and add to that value
-                Double currentCost = splitAmounts.get(currentSplitee);
-                currentCost+=costToAdd;
-                //if its split, then get the count of that person and add to that value
-                splitAmounts.put(currentSplitee,currentCost);
-                Log.d(TAG,"Split amounts is updated  " + splitAmounts);
+                getCurrentSplitee(costToAdd);
+
             }
             else {
-                currentCost += all_prices.get(merchant);
-                Log.d(TAG, "new cost : " + currentCost);
-                totalCost.setText("$" + df.format(currentCost).toString());
+                updateTotalCostAmount(costToAdd);
+//                currentCost += all_prices.get(merchant);
+//                Log.d(TAG, "new cost : " + currentCost);
+//                totalCost.setText("$" + df.format(currentCost).toString());
             }
                 JSONArray final_items = getFinalItems();
                 try {
@@ -392,7 +470,7 @@ public class HomeFragment extends Fragment {
         private void openShopSelector(final HashMap<String, Double> all_prices) {
             final String[] options = getAllOptions(all_prices);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity().getApplicationContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Where did you get this item from?");
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
@@ -407,12 +485,67 @@ public class HomeFragment extends Fragment {
             });
             builder.show();
         }
-
-        private int getCurrentSplitee()
+        private String[] getAllSplitees()
         {
-            //show dialog and return the value selected
-            return 2;
+            List<String> l = new ArrayList<String>();
+            for(int i = 0;  i<numberOfSplits;i++)
+            {
+                l.add(Integer.toString(i));
+            }
+            String[] options = new String[l.size()];
+            options = l.toArray(options);
+            return options;
         }
+
+        private void getCurrentSplitee(final Double price)
+        {
+            final String[] options = getAllSplitees();
+
+
+            //show dialog and return the value selected
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Who does this item belong to?");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // the user clicked on colors[which]
+                    Log.d(TAG, "Clicked on " + options[which]);
+                    currentSplitee=Integer.parseInt(options[which]);
+                    setCurrentSplitee(Integer.parseInt(options[which]) , price);
+                }
+            });
+            builder.show();
+            Log.d(TAG,"currnt splitee in getCurrentSplitee : " + currentSplitee);
+
+        }
+        //final step in setting split values
+        private void setCurrentSplitee(int val ,Double price)
+
+        {
+            Log.d(TAG,"Currnet splitee value changd " + val);
+
+            getCurrentValues();
+            Double currentCost = splitAmounts.get(Integer.toString(val));
+            currentCost+=price;
+            splitAmounts.put(Integer.toString(val),currentCost);
+
+
+            mDatabase.child("splits").child(user.getUid()).setValue(splitAmounts);
+
+            Log.d(TAG,"Split amounts is updated  " + splitAmounts);
+
+            firstTransaction=false;
+
+            //update visible text based on index
+            updateVisibleAmounts();
+
+        }
+
+        public void updateVisibleAmounts()
+        {
+            setSplittableLayout();
+        }
+
 
         public void setItemsList(JSONArray items , Double price) throws JSONException {
 
@@ -464,7 +597,7 @@ public class HomeFragment extends Fragment {
                             JSONObject currentOffer = all_offers.getJSONObject(i);
                             Double price = currentOffer.getDouble("price");
                             String merchant = currentOffer.getString("merchant");
-                            if (price != 0.0) {
+                            if (price != 0.00) {
                                 all_prices.put(merchant, price);
                             }
 
@@ -511,7 +644,52 @@ public class HomeFragment extends Fragment {
     {
         return this.final_price;
 
+
     }
+
+    private void updateTotalCostAmount(final Double price)
+    {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+
+
+        Query myQuery = mDatabase.child("users").child(user.getUid());
+        myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                    if(snap.getKey().equals("expenditure"))
+                    {
+
+                        Double exp = snap.getValue(Double.class);
+                        currentCost=exp;
+                        currentCost+=price;
+                        Log.d(TAG,"Current expendtiure : " + currentCost);
+                        totalCost.setText("$ " + currentCost.toString());
+
+                            mDatabase.child("users").child(user.getUid()).child("expenditure").setValue(currentCost);
+
+
+                    }
+
+
+                }
+                Log.d(TAG,"data snaps hot " + dataSnapshot);
+                Log.d(TAG,"SPlit amounts in get current vaue s; " + splitAmounts);
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
 
 
 }
