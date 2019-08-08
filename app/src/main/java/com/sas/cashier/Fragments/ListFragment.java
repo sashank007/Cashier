@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -16,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,6 +41,7 @@ import java.util.UUID;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -62,6 +65,7 @@ public class ListFragment extends Fragment {
     private FirebaseUser mUser;
     private ArrayList<Item> dataModels = new ArrayList<>();
     private ListView listView;
+    private BottomAppBar bottomAppBar;
     private Context context;
 
 
@@ -82,19 +86,40 @@ public class ListFragment extends Fragment {
 
         dataModels= new ArrayList<>();
 
-//
+        bottomAppBar = v.findViewById(R.id.navigation);
+        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.bottom_app_bar_home:
+                        loadFragment(new HomeFragment());
+                        return true;
+                    case R.id.bottom_app_bar_cart:
+                        loadFragment(new ListFragment());
+                        return true;
+
+                }
+                return false;
+            }
+        });
+
+
         getItems();
 
 
         return v;
     }
 
-    public void switchFragment(Fragment fragment)
-    {
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+    private boolean loadFragment(Fragment fragment) {
+        //switching fragment
+        if (fragment != null) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment, "MY_FRAGMENT")
+                    .commit();
+            return true;
+        }
+        return false;
     }
 
 
@@ -150,12 +175,12 @@ public class ListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+//        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+//        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 
 

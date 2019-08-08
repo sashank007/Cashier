@@ -5,7 +5,7 @@ public class User {
     public User()
     {}
 
-    public User(String email ,  String budget , Double expenditure)
+    public User(String email ,  Double budget , Double expenditure)
     {
         this.email=email;
         this.budget=budget;
@@ -15,7 +15,7 @@ public class User {
 
 
 
-    public String budget;
+    public Double budget;
 
     public Double expenditure;
 
@@ -23,9 +23,14 @@ public class User {
     {
         return this.email;
     }
-    public String getBudget()
+    public Double getBudget()
     {
         return this.budget;
+    }
+
+    public Double getExpenditure()
+    {
+        return this.expenditure;
     }
 
 

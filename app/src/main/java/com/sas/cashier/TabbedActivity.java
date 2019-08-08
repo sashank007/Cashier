@@ -20,10 +20,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,6 +46,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class TabbedActivity extends AppCompatActivity {
@@ -53,8 +58,12 @@ public class TabbedActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
+
+    private BottomAppBar bottomAppBar;
     private DatabaseReference mDatabase;
     private FirebaseUser mUser;
+    private static final int RC_BARCODE_CAPTURE = 9001;
+
     public static int CurrentUserMaxSpendingAmount = 0;
     private FirebaseAuth firebaseAuth;
 
@@ -86,8 +95,8 @@ public class TabbedActivity extends AppCompatActivity {
         mUser = firebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //setting action bar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+//        setSupportActionBar(myToolbar);
         Intent i = getIntent();
         Log.d("MAINACTIVITY","GETTING INTENT");
 
@@ -99,9 +108,25 @@ public class TabbedActivity extends AppCompatActivity {
             callRequiredFragment(this.getIntent().getExtras().getString("FragmentCall"),amount);
         }
 
-        BottomAppBar navigation = findViewById(R.id.navigation);
+//         bottomAppBar = findViewById(R.id.navigation);
+//        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.bottom_app_bar_home:
+//                        loadFragment(new HomeFragment());
+//                        return true;
+//                    case R.id.bottom_app_bar_cart:
+//                        loadFragment(new ListFragment());
+//                        return true;
+//
+//                }
+//                return false;
+//            }
+//        });
+
 //        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-//        na
+//
 //        navigation.setBackgroundColor(getResources().getColor(R.color.white));
 
 
@@ -211,7 +236,7 @@ public class TabbedActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.actionbar, menu);
+        getMenuInflater().inflate(R.menu.bottom_menu, menu);
         return true;
     }
 
@@ -220,7 +245,7 @@ public class TabbedActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 // User chose the "Settings" item, show the app settings UI...
-                refreshView();
+
                 return true;
             case R.id.action_logout:
                 firebaseAuth.signOut();
@@ -234,37 +259,6 @@ public class TabbedActivity extends AppCompatActivity {
         }
     }
 
-    public void refreshView() {
-
-        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered)
-                .setTitle("Warning!")
-                .setMessage("Are you sure you want to clear your cart?")
-                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        Fragment frg = null;
-                        frg = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-                        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.detach(frg);
-                        ft.attach(frg);
-                        ft.commit();
-
-                        //delete all items in cart
-                        DatabaseReference dbNode = FirebaseDatabase.getInstance().getReference().getRoot().child("items").child(mUser.getUid());
-                        dbNode.setValue(null);
-                        DatabaseReference dbNodeExp = FirebaseDatabase.getInstance().getReference().getRoot().child("users").child(mUser.getUid()).child("expenditure");
-                        dbNodeExp.setValue(null);
-
-                        //display message
-
-
-                    }
-                }).show();
-
-
-
-    }
 
     public void callRequiredFragment(String extra , String amount)
     {
@@ -289,6 +283,31 @@ public class TabbedActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_BARCODE_CAPTURE) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+
+//                    fetchUPCData(barcode.displayValue);
+                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
+                } else {
+
+                    Log.d(TAG, "No barcode captured, intent data is null");
+                }
+            } else {
+
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
 }
 
 

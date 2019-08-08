@@ -34,6 +34,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import static com.sas.cashier.AsyncFetchUPCData.TAG;
+
 public class SignUpActivity extends Activity {
 
     public static String INTENT_PHONE = "INTENT_PHONE";
@@ -71,7 +73,7 @@ public class SignUpActivity extends Activity {
     {
         sharedPreferences = this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         time_to_login=System.currentTimeMillis();
-        et_email = (EditText) findViewById(R.id.et_email);
+        et_email = findViewById(R.id.et_email);
         et_password = findViewById(R.id.et_password);
         et_budget = findViewById(R.id.et_budget);
         bt_signup=findViewById(R.id.signup_btn);
@@ -112,7 +114,8 @@ public class SignUpActivity extends Activity {
                     // user registered, start profile activity
                     Toast.makeText(SignUpActivity.this,"Account Created",Toast.LENGTH_LONG).show();
                     System.out.println("new user succesfully created" + user.getUid());
-                    User newUser = new User(f_email,f_budget, 0.0);
+                    Double budget = Double.parseDouble(f_budget);
+                    User newUser = new User(f_email,budget, 0.0);
                     mDatabase.child("users").child(user.getUid()).setValue(newUser);
 
                     finish();
@@ -227,8 +230,9 @@ public class SignUpActivity extends Activity {
 
                 email = et_email.getText().toString().trim().toLowerCase();
                 budget = et_budget.getText().toString().trim();
+                Log.d(TAG,"budget : " + budget);
                 passWord = et_password.getText().toString().trim();
-                String uniqueID = UUID.randomUUID().toString();
+
                 writeNewUser(email,passWord, budget);
 //
 //                Intent intent = new Intent(this, MainActivity.class);

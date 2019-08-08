@@ -1,108 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:id="@+id/home_frag"
     android:layout_width="match_parent"
-    android:background="@color/darkGrey"
+    android:background="@color/backgroundColor"
     android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/total_cost_split"
-        android:layout_width="189dp"
-        android:layout_height="76dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="116dp"
-        android:layout_marginLeft="116dp"
-        android:layout_marginTop="232dp"
-        android:gravity="center|center_horizontal"
-        android:shadowColor="#444343"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:text="$ 0.00"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#f3baba"
-        android:textSize="42sp"
-        android:textStyle="bold"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/total_cost"
-        android:layout_width="189dp"
-        android:layout_height="77dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="116dp"
-        android:layout_marginLeft="116dp"
-        android:layout_marginTop="232dp"
-        android:gravity="center|center_horizontal"
-        android:shadowColor="#444343"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:text="$ 0.00"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/colorPrimary"
-        android:textSize="42sp"
-        android:textStyle="bold"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/split"
-        android:layout_width="28dp"
-        android:layout_height="27dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardview_listview"
+        android:layout_width="383dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="120dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:checked="false"
+        android:background="@color/darkPrimary"
+        app:cardBackgroundColor="@color/darkPrimary"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.912"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:useMaterialThemeColors="false" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/read_barcode"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="168dp"
-        android:layout_marginLeft="168dp"
-        android:layout_marginTop="208dp"
-        android:gravity="center|center_horizontal"
-        android:text="@string/barcode_reader"
-        android:visibility="gone"
-        app:elevation="21dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/total_cost" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_group"
-        android:layout_width="35dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="308dp"
-        android:layout_marginLeft="308dp"
-        android:layout_marginTop="8dp"
+            <ListView
+                android:id="@+id/list_splits"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+
+
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:divider="@null" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_splitt"
+        android:layout_width="184dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="277dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="76dp"
-        android:text="Split"
-        app:layout_constraintBottom_toTopOf="@+id/total_cost"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:background="@color/darkPrimary"
+        app:cardBackgroundColor="@color/darkPrimary"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_split_index"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.742" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"-->
+                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                <!--android:id="@+id/split"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="22dp"-->
+
+                <!--android:layout_alignParentStart="true"-->
+
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginStart="97dp"-->
+                <!--android:layout_marginLeft="97dp"-->
+                <!--android:layout_marginTop="26dp"-->
+                <!--android:checked="false"-->
+                <!--app:useMaterialThemeColors="false" />-->
+            <com.google.android.material.switchmaterial.SwitchMaterial xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/issplit"
+                android:layout_width="100dp"
+                android:layout_height="69dp"
+
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="36dp"
+                android:layout_marginLeft="36dp"
+                android:layout_marginTop="0dp"
+                android:fontFamily="@font/open_sans_light"
+                android:text="Split"
+                app:useMaterialThemeColors="false" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="131dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="36dp"
+                android:layout_marginLeft="36dp"
+                android:layout_marginTop="80dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/open_sans_light"
+                android:id="@+id/btn_clearcart"
+                android:gravity="center_horizontal|left"
+                android:paddingLeft="0dp"
+                android:text="Clear Cart"
+                android:textAllCaps="true"
+                android:textColor="#fff"
+                app:elevation="19dp" />
+
+
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="180dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="277dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/darkPrimary"
+        app:cardBackgroundColor="@color/darkPrimary"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cardView_splitt"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/total_cost_split"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="0dp"
+                android:layout_marginRight="0dp"
+                android:gravity="center"
+                android:shadowColor="#444343"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:text="$ 0.00"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#fff"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/total_cost"
+                android:layout_width="380dp"
+                android:layout_height="400dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="0dp"
+                android:layout_marginRight="0dp"
+
+                android:gravity="center"
+                android:shadowColor="#444343"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:text="$ 0.00"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#fff"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/total_cost"-->
+        <!--android:layout_width="189dp"-->
+        <!--android:layout_height="77dp"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginStart="116dp"-->
+        <!--android:layout_marginLeft="116dp"-->
+        <!--android:layout_marginTop="232dp"-->
+        <!--android:gravity="center|center_horizontal"-->
+        <!--android:shadowColor="#444343"-->
+        <!--android:shadowDx="1"-->
+        <!--android:shadowDy="1"-->
+        <!--android:text="$ 0.00"-->
+        <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+        <!--android:textColor="@color/colorPrimary"-->
+        <!--android:textSize="42sp"-->
+        <!--android:textStyle="bold"-->
+        <!--android:visibility="visible"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_3"
+        android:layout_width="383dp"
+        android:layout_height="156dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="430dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@color/darkPrimary"
+        app:cardBackgroundColor="@color/darkPrimary"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="17dp"
+                android:layout_marginLeft="17dp"
+                android:layout_marginTop="33dp"
+                android:fontFamily="@font/open_sans_light"
+                android:textColor="#fff"
+                android:text="Budget" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginStart="17dp"
+                android:layout_marginLeft="17dp"
+                android:layout_marginTop="52dp"
+                android:layout_marginEnd="16dp"
+
+                android:layout_marginRight="16dp"
+                android:progress="0" />
+
+            <TextView
+                android:id="@+id/tv_budgetpercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="330dp"
+                android:layout_marginTop="100dp"
+                android:fontFamily="@font/open_sans_light"
+                android:text="0%" />
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
 
     <TextView
         android:id="@+id/tv_split_index"
@@ -116,11 +310,44 @@
         android:fontFamily="sans-serif-black"
         android:gravity="clip_horizontal|center"
         android:text="0"
-        android:textColor="#ffae57 "
+        android:textColor="#ffae57"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent">
+
+        <!-- Other components and views -->
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_gravity="bottom"
+            app:backgroundTint="@color/darkPrimary"
+            app:buttonGravity="bottom|top"
+
+            app:fabAlignmentMode="end"
+            app:fabCradleVerticalOffset="2dp"
+
+            app:menu="@menu/bottom_menu" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+            android:outlineAmbientShadowColor="@color/darkGrey"
+            android:src="@drawable/ic_add_black_24dp"
+
+            app:layout_anchor="@id/navigation" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

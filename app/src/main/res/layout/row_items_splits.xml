@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginRight="9dp"
+        android:background="#fff"
+        card_view:cardElevation="8dp"
+        card_view:cardBackgroundColor="@color/darkGrey"
+        card_view:cardCornerRadius="4dp">
+
+        <TextView
+            android:id="@+id/tv_amount"
+            android:layout_width="100dp"
+            android:layout_height="46dp"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/roboto"
+            android:gravity="clip_horizontal|center|clip_vertical"
+
+            android:lineHeight="2sp"
+            android:text="Price"
+            android:textColor="#fff"
+            android:textFontWeight="10" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="150dp"
+            android:layout_height="46dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+
+            android:fontFamily="@font/open_sans_light"
+            android:gravity="center|left"
+            android:maxLength="12"
+            android:text="Title"
+            android:textColor="#fff"
+            android:textSize="16sp" />
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
