@@ -32,6 +32,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/img_nosplits"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="160dp"
+                android:layout_marginTop="60dp"
+                app:srcCompat="@drawable/ic_group_add_black_24dp" />
+
+            <TextView
+                android:id="@+id/no_splits_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="75dp"
+
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/open_sans_light"
+                android:text="You don't have any splits for now." />
+
             <ListView
                 android:id="@+id/list_splits"
                 android:layout_width="match_parent"
@@ -46,7 +64,8 @@
                 android:layout_marginLeft="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:divider="@null" />
+                android:divider="@null"
+                android:visibility="invisible" />
 
         </RelativeLayout>
 
@@ -317,8 +336,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
 
         android:layout_height="match_parent">
@@ -348,6 +366,8 @@
 
             app:layout_anchor="@id/navigation" />
 
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

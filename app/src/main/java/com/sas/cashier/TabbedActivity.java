@@ -21,11 +21,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -57,6 +61,11 @@ public class TabbedActivity extends AppCompatActivity {
     ColorStateList myStateList;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    private Button showSheet;
+
+    private LinearLayout layoutBottomSheet;
+    BottomSheetBehavior sheetBehavior;
+
 
 
     private BottomAppBar bottomAppBar;
@@ -94,6 +103,11 @@ public class TabbedActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         mUser = firebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+//        showSheet = findViewById(R.id.show_bottomsheet);
+
+//        layoutBottomSheet=findViewById(R.id.bottom_sheet);
+
         //setting action bar
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 //        setSupportActionBar(myToolbar);
@@ -107,6 +121,51 @@ public class TabbedActivity extends AppCompatActivity {
             String amount = this.getIntent().getExtras().getString("amount");
             callRequiredFragment(this.getIntent().getExtras().getString("FragmentCall"),amount);
         }
+
+
+//        sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
+//
+//        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+//                switch (newState) {
+//                    case BottomSheetBehavior.STATE_HIDDEN:
+//                        break;
+//                    case BottomSheetBehavior.STATE_EXPANDED: {
+//
+//                    }
+//                    break;
+//                    case BottomSheetBehavior.STATE_COLLAPSED: {
+//                    }
+//                    break;
+//                    case BottomSheetBehavior.STATE_DRAGGING:
+//                        break;
+//                    case BottomSheetBehavior.STATE_SETTLING:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//
+//            }
+//        });
+
+//        showSheet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+//                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//                }
+//                else {
+//                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//
+//                }
+//            }
+//        });
+
+
 
 //         bottomAppBar = findViewById(R.id.navigation);
 //        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

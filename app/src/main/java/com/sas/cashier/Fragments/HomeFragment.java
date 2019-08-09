@@ -1,31 +1,19 @@
 package com.sas.cashier.Fragments;
 
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
@@ -35,7 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.bottomappbar.BottomAppBar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -50,27 +38,19 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.HttpGet;
 import com.sas.cashier.BarcodeCaptureActivity;
-import com.sas.cashier.CustomAdapter;
 import com.sas.cashier.CustomAdapterSplits;
 import com.sas.cashier.Data.Item;
 import com.sas.cashier.Data.Splits;
 import com.sas.cashier.Data.User;
-import com.sas.cashier.ListActivity;
-import com.sas.cashier.MainActivity;
 import com.sas.cashier.R;
-import com.sas.cashier.TabbedActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -79,7 +59,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import cz.msebera.android.httpclient.HttpEntity;
@@ -122,6 +101,12 @@ public class HomeFragment extends Fragment {
     private FirebaseUser mUser;
     private FloatingActionButton fab;
     private ProgressBar progressBar;
+    private ImageView imgNoSplits;
+    private TextView tv_noSplits;
+    private LinearLayout layoutBottomSheet;
+    private ImageView add_splitee_btn;
+    BottomSheetBehavior sheetBehavior;
+    List<String> allSplitees = new ArrayList<String>();
 
 
 
@@ -131,28 +116,20 @@ public class HomeFragment extends Fragment {
         LayoutInflater lf = getActivity().getLayoutInflater();
         View v = lf.inflate ( R.layout.home_fragment, container, false );
 
+        Log.d(TAG, "on create view");
+
+        listView=(ListView)v.findViewById(R.id.list_splits);
+//
+        adapter= new CustomAdapterSplits(dataModels,getContext());
+
+        listView.setAdapter(adapter);
+
         initializeVars(v);
 
 
 
 
-        listView=(ListView)v.findViewById(R.id.list_splits);
 
-
-
-        Splits s1 = new Splits("Michael" , 5.00);
-        Splits s2 = new Splits("Dwight" , 4.30);
-        Splits s3 = new Splits("John" , 2.00);
-        Splits s4= new Splits("Mindy" ,5.40);
-        dataModels.add(s1);
-        dataModels.add(s2);
-        dataModels.add(s3);
-        dataModels.add(s4);
-
-
-        adapter= new CustomAdapterSplits(dataModels,getContext());
-
-        listView.setAdapter(adapter);
         return v;
     }
 
@@ -173,6 +150,7 @@ public class HomeFragment extends Fragment {
         firebaseAuth  = FirebaseAuth.getInstance();
         mUser = firebaseAuth.getCurrentUser();
 
+        add_splitee_btn=v.findViewById(R.id.img_nosplits);
         totalCost = v.findViewById(R.id.total_cost);
         totalCost.setShadowLayer(1, 0, 0, Color.BLACK);
 
@@ -184,8 +162,21 @@ public class HomeFragment extends Fragment {
         cleartCart = v.findViewById(R.id.btn_clearcart);
         progressBar = v.findViewById(R.id.progressBar);
         tv_budget_percent= v.findViewById(R.id.tv_budgetpercent);
+//        layoutBottomSheet=v.findViewById(R.id.bottom_sheet);
+        tv_noSplits=v.findViewById(R.id.no_splits_text);
+        imgNoSplits=v.findViewById(R.id.img_nosplits);
+
 
         fab = v.findViewById(R.id.fab);
+
+        add_splitee_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                loadFragment(new AddSplitsFragment());
+
+            }
+        });
 
          bottomAppBar = v.findViewById(R.id.navigation);
         bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -199,6 +190,10 @@ public class HomeFragment extends Fragment {
                         loadFragment(new ListFragment());
                         return true;
 
+                    case R.id.bottom_app_bar_list:
+                        loadFragment(new AddSplitsFragment());
+                        return true;
+
                 }
                 return false;
             }
@@ -207,11 +202,27 @@ public class HomeFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(isSplit.isChecked() && adapter.isEmpty())
+                {
+                    new MaterialAlertDialogBuilder(getContext(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered)
+                            .setTitle("Warning!")
+                            .setMessage("Please add a friend to split your bill with!")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
 
-                Intent intent = new Intent(getContext(), BarcodeCaptureActivity.class);
-                intent.putExtra(BarcodeCaptureActivity.AutoFocus,true);
-                intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
-                startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                                }
+                            }).show();
+
+                }
+                else {
+
+
+                    Intent intent = new Intent(getContext(), BarcodeCaptureActivity.class);
+                    intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
+                    intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
+                    startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                }
 
             }
 
@@ -221,7 +232,7 @@ public class HomeFragment extends Fragment {
         isSplit= v.findViewById(R.id.issplit);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        updateTotalCostAmount(0.0);
+        updateTotalCostAmount(0.00);
 
 
         cleartCart.setOnClickListener(new View.OnClickListener() {
@@ -252,6 +263,37 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+        fetchSplits();
+
+//        sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
+//
+//        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+//                switch (newState) {
+//                    case BottomSheetBehavior.STATE_HIDDEN:
+//                        break;
+//                    case BottomSheetBehavior.STATE_EXPANDED: {
+//
+//                    }
+//                    break;
+//                    case BottomSheetBehavior.STATE_COLLAPSED: {
+//                    }
+//                    break;
+//                    case BottomSheetBehavior.STATE_DRAGGING:
+//                        break;
+//                    case BottomSheetBehavior.STATE_SETTLING:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//
+//            }
+//        });
+
+
 
 
         isSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -264,6 +306,7 @@ public class HomeFragment extends Fragment {
 
 //                    showNumberPicker();
                     shouldSplit=true;
+//                    loadFragment(new AddSplitsFragment());
 
                 }
               else
@@ -315,6 +358,14 @@ public class HomeFragment extends Fragment {
 //        }
 //    }
 
+    public void refreshFragment()
+    {
+        Fragment currentFragment = getFragmentManager().findFragmentByTag("YourFragmentTag");
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.detach(currentFragment);
+        fragmentTransaction.attach(currentFragment);
+        fragmentTransaction.commit();
+    }
     public void setSplittableLayout()
     {
         //inside this we hide the old dollar ammount and set number of dollar amounts to be equal to numberOfSplits
@@ -353,14 +404,7 @@ public class HomeFragment extends Fragment {
 //              setSplittableLayout();
             }
         });
-//        b1.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG,"number of splits : " + numberOfSplits);
-//                d.dismiss();
-//            }
-//        });
+
 
         d.show();
 
@@ -441,8 +485,7 @@ public class HomeFragment extends Fragment {
 
         }
 
-        private void getCurrentValues()
-        {
+        private void getCurrentValues() {
 
             FirebaseUser user = firebaseAuth.getCurrentUser();
 
@@ -456,12 +499,12 @@ public class HomeFragment extends Fragment {
 
                     for (DataSnapshot snap : dataSnapshot.getChildren()) {
 //                       Double value = snap.getValue(Double.class);
-                        Log.d(TAG,"Snap value : "  + snap.getValue() );
-                        Log.d(TAG,"SNap key : " + snap.getKey());
-                        splitAmounts.put(snap.getKey(),Double.parseDouble(snap.getValue().toString()));
+                        Log.d(TAG, "Snap value : " + snap.getValue());
+                        Log.d(TAG, "SNap key : " + snap.getKey());
+                        splitAmounts.put(snap.getKey(), Double.parseDouble(snap.getValue().toString()));
 
                     }
-                    Log.d(TAG,"SPlit amounts in get current vaue s; " + splitAmounts);
+                    Log.d(TAG, "SPlit amounts in get current vaue s; " + splitAmounts);
 
 
                 }
@@ -478,15 +521,13 @@ public class HomeFragment extends Fragment {
         private void setTotalCost(Double price, String merchant) {
             DecimalFormat df = new DecimalFormat("#.##");
 
-            if(shouldSplit)
-            {
-                Log.d(TAG,"splits : " + numberOfSplits);
+            if (shouldSplit) {
+                Log.d(TAG, "splits : " + numberOfSplits);
 
                 //open dialog for selecting currentSplitee
-                getCurrentSplitee(price);
+                getAllSplitees(price);
 
-            }
-            else {
+            } else {
                 Log.d(TAG, "Current cost : " + currentCost);
                 updateTotalCostAmount(price);
 //                currentCost += price;
@@ -494,41 +535,40 @@ public class HomeFragment extends Fragment {
 //                totalCost.setText("$ " + df.format(currentCost).toString());
 
             }
-                JSONArray final_items = getFinalItems();
-                try {
-                    setItemsList(final_items, price);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            JSONArray final_items = getFinalItems();
+            try {
+                setItemsList(final_items, price);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
 
         }
+
+
 
         private void setTotalCost(HashMap<String, Double> all_prices, String merchant) {
             DecimalFormat df = new DecimalFormat("#.##");
 
             Log.d(TAG, "Current cost : " + currentCost);
-            Double costToAdd= all_prices.get(merchant);
-            if(shouldSplit)
-            {
+            Double costToAdd = all_prices.get(merchant);
+            if (shouldSplit) {
 
                 //open dialog for selecting currentSplitee
-                getCurrentSplitee(costToAdd);
+                getAllSplitees(costToAdd);
 
-            }
-            else {
+            } else {
                 updateTotalCostAmount(costToAdd);
 //                currentCost += all_prices.get(merchant);
 //                Log.d(TAG, "new cost : " + currentCost);
 //                totalCost.setText("$" + df.format(currentCost).toString());
             }
-                JSONArray final_items = getFinalItems();
-                try {
-                    setItemsList(final_items, all_prices.get(merchant));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+            JSONArray final_items = getFinalItems();
+            try {
+                setItemsList(final_items, all_prices.get(merchant));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
 
         }
@@ -552,29 +592,63 @@ public class HomeFragment extends Fragment {
                     // the user clicked on colors[which]
                     Log.d(TAG, "Clicked on " + options[which]);
 
-                        setTotalCost(all_prices, options[which]);
+                    setTotalCost(all_prices, options[which]);
 
 
                 }
             });
             builder.show();
         }
-        private String[] getAllSplitees()
-        {
-            List<String> l = new ArrayList<String>();
-            for(int i = 0;  i<numberOfSplits;i++)
-            {
-                l.add(Integer.toString(i));
-            }
-            String[] options = new String[l.size()];
-            options = l.toArray(options);
-            return options;
+
+        //@TODO: Convert this to get all splitNames from splits table
+        private void getAllSplitees(final Double price) {
+
+            allSplitees.clear();
+
+            //get values from the splits query
+            Query myQuery = mDatabase.child("splits").child(mUser.getUid());
+            myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChildren()) {
+                        Log.d(TAG,"new split list : "  + allSplitees);
+                        for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                            Splits item = snap.getValue(Splits.class);
+                            allSplitees.add(item.getName());
+                        }
+
+                        Log.d(TAG,"all splitees: " + allSplitees);
+                        String[] options = new String[allSplitees.size()];
+                        options = allSplitees.toArray(options);
+                        Log.d(TAG,"options : " + options.toString());
+                        getCurrentSplitee(price , options);
+                    }
+                }
+
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+
+
+            });
+
+
+
         }
 
-        private void getCurrentSplitee(final Double price)
-        {
-            final String[] options = getAllSplitees();
 
+
+
+
+        private void getCurrentSplitee(final Double price ,final String[] options)
+        {
+//            final String[] options = getAllSplitees();
+
+            //@TODO: update this to update db amount whenever that name is selected in splits
 
             //show dialog and return the value selected
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -584,34 +658,79 @@ public class HomeFragment extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
                     // the user clicked on colors[which]
                     Log.d(TAG, "Clicked on " + options[which]);
-                    currentSplitee=Integer.parseInt(options[which]);
-                    setCurrentSplitee(Integer.parseInt(options[which]) , price);
+
+                    setCurrentSplitee(options[which] , price);
                 }
             });
             builder.show();
-            Log.d(TAG,"currnt splitee in getCurrentSplitee : " + currentSplitee);
 
         }
+
         //final step in setting split values
-        private void setCurrentSplitee(int val ,Double price)
+        private void setCurrentSplitee(String val ,Double price)
 
         {
-            Log.d(TAG,"Currnet splitee value changd " + val);
+            Log.d(TAG,"Currnet splitee value changd " + val + price);
+//
+//            getCurrentValues();
+//            Double currentCost = splitAmounts.get(Integer.toString(val));
+//            currentCost+=price;
+            //set the given price to that name
+            setNewSplitAmount(val , price);
+//            splitAmounts.put(Integer.toString(val),currentCost);
 
-            getCurrentValues();
-            Double currentCost = splitAmounts.get(Integer.toString(val));
-            currentCost+=price;
-            splitAmounts.put(Integer.toString(val),currentCost);
 
 
-            mDatabase.child("splits").child(user.getUid()).setValue(splitAmounts);
+
+//            mDatabase.child("splits").child(user.getUid()).setValue(splitAmounts);
 
             Log.d(TAG,"Split amounts is updated  " + splitAmounts);
 
             firstTransaction=false;
 
             //update visible text based on index
-            updateVisibleAmounts();
+//            updateVisibleAmounts();
+
+        }
+
+        public void setNewSplitAmount(final String name , final Double price)
+        {
+
+            Query myQuery = mDatabase.child("splits").child(mUser.getUid());
+            myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChildren()) {
+//                        String id  = dataSnapshot.getChildren.getValu(String.class);
+
+                        for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                            Log.d(TAG,"id : "  +  snap.getKey());
+                            Splits item = snap.getValue(Splits.class);
+                            if(item.getName().equals(name))
+                            {
+                                String id = snap.getKey();
+                                Double currentCost = item.getAmount();
+                                currentCost+=price;
+                                Log.d(TAG,"updating price for " + name + " " + currentCost);
+                                mDatabase.child("splits").child(user.getUid()).child(id).child("AmountSpent").setValue(currentCost);
+
+                            }
+                        }
+                        fetchSplits();
+                    }
+                }
+
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+
+
+            });
+
 
         }
 
@@ -789,10 +908,14 @@ public class HomeFragment extends Fragment {
                         dbNode.setValue(null);
                         DatabaseReference dbNodeExp = FirebaseDatabase.getInstance().getReference().getRoot().child("users").child(mUser.getUid()).child("expenditure");
                         dbNodeExp.setValue(0);
-                        currentCost=0.0;
+                        currentCost=0.00;
                         totalCost.setText("$ "+currentCost.toString());
+                        //delete all splits
+                        DatabaseReference dbNodeSplits = FirebaseDatabase.getInstance().getReference().getRoot().child("splits").child(mUser.getUid());
+                        dbNodeSplits.setValue(null);
+                        //uncheck splits
+                        isSplit.setChecked(false);
 
-                        //display message
 
 
                     }
@@ -801,6 +924,102 @@ public class HomeFragment extends Fragment {
 
 
     }
+
+    private void fetchSplits()
+    {
+
+        Query myQuery = mDatabase.child("splits").child(mUser.getUid());
+        myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            List<Item> myList = new ArrayList<>();
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Double currentCost=0.0;
+                if (dataSnapshot.hasChildren())
+                {
+                  if(!adapter.isEmpty())
+                  {
+                      adapter.clear();
+                  }
+                    for (DataSnapshot snap : dataSnapshot.getChildren()) {
+
+                        Splits item = snap.getValue(Splits.class);
+                        currentCost+=item.getAmount();
+                        Log.d("TAG", "Splits : " + snap);
+                        dataModels.add(item);
+//                    myList.add(item);
+                    }
+//                updateExpensesList(myList);
+                    Log.d(TAG,"has children");
+
+                    listView.setVisibility(View.VISIBLE);
+                    tv_noSplits.setVisibility(View.INVISIBLE);
+                    imgNoSplits.setVisibility(View.INVISIBLE);
+                    isSplit.setChecked(true);
+
+            }
+            else
+                {
+                    tv_noSplits.setVisibility(View.VISIBLE);
+                    imgNoSplits.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.INVISIBLE);
+                    isSplit.setChecked(false);
+                }
+                adapter= new CustomAdapterSplits(dataModels,getContext());
+
+                listView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+
+                listView.invalidateViews();
+                listView.refreshDrawableState();
+                Log.d(TAG,"current cost in fetchSplit : "  +currentCost);
+                updateTotalSplitAmount(currentCost);
+        }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+    }
+
+    private void updateTotalSplitAmount(final Double currentCost)
+    {
+
+        Query myQuery = mDatabase.child("users").child(user.getUid());
+        myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snap) {
+
+                User u = snap.getValue(User.class);
+
+                Double budget = u.getBudget();
+
+                Log.d(TAG,"Current expendtiure : " + currentCost);
+                totalCost.setText("$ " + currentCost.toString());
+                Double percent =(currentCost/budget)*100;
+                int perc = percent.intValue();
+
+                updateProgressBar(perc);
+                mDatabase.child("users").child(user.getUid()).child("expenditure").setValue(currentCost);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+    }
+
+
 
 
 }

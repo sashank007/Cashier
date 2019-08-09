@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:windowSoftInputMode="adjustNothing"
+    android:background="@color/backgroundColor"
+    android:isScrollContainer="false"
+android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:id="@+id/add_splits_text"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/open_sans_light"
+        android:text="Add friends to split with..."/>
+
+    <ListView
+        android:id="@+id/list_view_addsplit"
+        android:layout_width="395dp"
+        android:layout_height="604dp"
+        android:layout_marginStart="8dp"
+        android:divider="@null"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:windowSoftInputMode="adjustNothing"
+        android:layout_height="match_parent">
+
+        <!-- Other components and views -->
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_gravity="bottom"
+            app:backgroundTint="@color/darkPrimary"
+            android:windowSoftInputMode="adjustNothing"
+            app:buttonGravity="bottom|top"
+
+            app:fabAlignmentMode="end"
+            app:fabCradleVerticalOffset="2dp"
+
+            app:menu="@menu/bottom_menu" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:windowSoftInputMode="adjustNothing"
+            android:isScrollContainer="false"
+            android:layout_height="wrap_content"
+            android:outlineAmbientShadowColor="@color/darkGrey"
+            android:src="@drawable/ic_add_black_24dp"
+
+            app:layout_anchor="@id/navigation" />
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

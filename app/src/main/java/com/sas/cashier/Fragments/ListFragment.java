@@ -59,6 +59,7 @@ public class ListFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private long selectedDate;
     String expenditureTypeValue , expenditureSubTypeValue;
+    private TextView noItems_tv;
 
     Spinner dropdown;
     private static CustomAdapter adapter;
@@ -83,10 +84,14 @@ public class ListFragment extends Fragment {
 
 
         listView=(ListView)v.findViewById(R.id.list);
+        noItems_tv=v.findViewById(R.id.no_items_text);
+
+
 
         dataModels= new ArrayList<>();
 
         bottomAppBar = v.findViewById(R.id.navigation);
+
         bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -98,11 +103,14 @@ public class ListFragment extends Fragment {
                         loadFragment(new ListFragment());
                         return true;
 
+                    case R.id.bottom_app_bar_list:
+                        loadFragment(new AddSplitsFragment());
+                        return true;
+
                 }
                 return false;
             }
         });
-
 
         getItems();
 
@@ -139,14 +147,17 @@ public class ListFragment extends Fragment {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()) {
+                    noItems_tv.setVisibility(View.INVISIBLE);
 
-                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    Item item = snap.getValue(Item.class);
-                    Log.d("TAG","item : " + item);
-                    myList.add(item);
+                    for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                        Item item = snap.getValue(Item.class);
+                        Log.d("TAG", "item : " + item);
+                        myList.add(item);
+                    }
+                    updateExpensesList(myList);
+
                 }
-                updateExpensesList(myList);
-
             }
 
             @Override
